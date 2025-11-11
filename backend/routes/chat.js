@@ -1,0 +1,88 @@
+import express from 'express'
+import Thread from '../models/Thread.js';
+import getGeminiResponse from '../utils/gemini.js';
+
+const router = express.Router();
+
+router.post("/test", async(req, res)=>{
+    try{
+        const thread = new Thread({
+            threadId: "123",
+            title: "testing the new Thread "
+        });
+        const response = await thread.save();
+        res.send(response);
+    }catch(err){
+        console.log("error occur", err);
+        res.status(500).json({error: "failed to save in DB"});
+    }
+});
+
+router.get("/thread", async(req,res)=>{
+    try{
+        const threads = await Thread.find({}).sort({updated: -1});
+        res.json(threads);
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: "failed to fetch threads"});
+    }
+})
+
+router.get("/thread/:threadId", async(req, res)=>{
+    const {threadId} = req.params;
+
+    try{
+        const thread = await Thread.findOne({threadId});
+        if(!thread){
+            res.status(404).json({error: "threads not found"});
+        }
+        res.json(thread.message);
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: "failed to fetch threads"});
+    }
+})
+
+router.delete("/thread/:threadId", async(req,res)=>{
+    const {threadId} = req.params;
+
+    try{
+        const deletedThread = await Thread.findOneAndDelete({threadId});
+        if(!deletedThread){
+            res.status(404).json({error: "threadnot found"});
+        }
+        res.status(200).json({success: "thread delted successfully"});
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: "failed to delete thread"});
+    }
+})
+
+router.post("/chat", async(req, res)=>{
+    const  {threadId, messages} = req.body;
+
+    if(!threadId || !messages){
+        res.status(400).json({error: "missing required fileds"});
+    }
+    try{
+        const thread = await Thread.findOne({threadId});
+        if(!thread){
+            thread = new thread({
+                threadId,
+                title: messages,
+                message: [{role: "user", content: messages}]
+            })
+        }else{
+            thread.message.push({role: "user", content: messages});
+        }
+        const assistantReply = await getGeminiResponse(messages);
+        thread.message.push({role: "assistant", content: assistantReply});
+        thread.updatedAt = new Date();
+        await thread.save();
+        res.json({reply: assistantReply});
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: "something went wrong"});
+    }
+})
+export default router;

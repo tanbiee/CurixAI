@@ -1,0 +1,15 @@
+backend will have three main things : models, utils, routes
+
+MODELS:
+we will make a thread Schema where each thread will associate with individual ai chat  it will consist
+1. threadID
+2. title
+3. messages
+4. created_At
+5. updated_At
+
+2. messages Schema: 
+it is from messages
+where content will be there,
+role : user, assistent
+time stamp
