@@ -34,7 +34,7 @@ router.get("/thread/:threadId", async(req, res)=>{
     try{
         const thread = await Thread.findOne({threadId});
         if(!thread){
-            res.status(404).json({error: "threads not found"});
+            return res.status(404).json({error: "threads not found"});
         }
         res.json(thread.message);
     }catch(err){
@@ -59,30 +59,30 @@ router.delete("/thread/:threadId", async(req,res)=>{
 })
 
 router.post("/chat", async(req, res)=>{
-    const  {threadId, messages} = req.body;
+    const  {threadId, message} = req.body;
 
-    if(!threadId || !messages){
-        res.status(400).json({error: "missing required fileds"});
+    if(!threadId || !message){
+        return res.status(400).json({error: "missing required fileds"});
     }
     try{
-        const thread = await Thread.findOne({threadId});
+        let thread = await Thread.findOne({threadId});
         if(!thread){
-            thread = new thread({
+            thread = new Thread({
                 threadId,
-                title: messages,
-                message: [{role: "user", content: messages}]
+                title: message,
+                message: [{role: "user", content: message}]
             })
         }else{
-            thread.message.push({role: "user", content: messages});
+            thread.message.push({role: "user", content: message});
         }
-        const assistantReply = await getGeminiResponse(messages);
+        const assistantReply = await getGeminiResponse(message);
         thread.message.push({role: "assistant", content: assistantReply});
         thread.updatedAt = new Date();
         await thread.save();
         res.json({reply: assistantReply});
     }catch(err){
-        console.log(err);
-        res.status(500).json({error: "something went wrong"});
+        console.error("Chat endpoint error:", err.message);
+        res.status(500).json({error: err.message || "something went wrong"});
     }
 })
 export default router;

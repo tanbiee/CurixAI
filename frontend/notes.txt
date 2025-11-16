@@ -1,0 +1,6 @@
+the components we gonna design will be 
+-sidebar
+-chatWindow
+-navbar
+-chat
+-input text fieled
