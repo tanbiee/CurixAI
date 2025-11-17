@@ -1,7 +1,30 @@
 .chats{
-    max-width: 700px;
-    overflow-y: scroll;
-    padding: 8rem;
+    max-width: 900px;
+    /* allow scrolling only when content overflows */
+    overflow-y: auto;
+    /* limit height so overflow can occur when needed (adjust as needed) */
+    max-height: calc(100vh - 200px);
+    padding: 2rem;
+    box-sizing: border-box;
+
+}
+
+/* custom scrollbar (webkit browsers) */
+.chats::-webkit-scrollbar{
+    width: 8px;
+}
+.chats::-webkit-scrollbar-track{
+    background: transparent;
+}
+.chats::-webkit-scrollbar-thumb{
+    background-color: rgba(255,255,255,0.12);
+    border-radius: 8px;
+}
+
+/* Firefox */
+.chats{
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.12) transparent;
 }
 
 .userDiv{
@@ -20,7 +43,7 @@
 }
 
 pre{
-    white-space: wrap;
+    white-space: pre-wrap;
 }
 
 .userMessage{

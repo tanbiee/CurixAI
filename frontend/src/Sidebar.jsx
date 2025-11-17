@@ -5,6 +5,7 @@ import { useContext } from 'react';
 import { MyContext } from './MyContext';
 import { v1 as uuidv1 } from 'uuid';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 export default function Sidebar() {
   const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats} = useContext(MyContext);
 
@@ -49,6 +50,21 @@ export default function Sidebar() {
       console.error(err);
     }
   }
+  const deleteThread = async(threadId)=>{
+    try{
+      const response = await fetch(`http://localhost:3030/api/thread/${threadId}`,{method: "DELETE"})
+      const res = await response.json();
+      console.log(res);
+      //update threads re-render
+      setAllThreads(prev=>prev.filter(thread=>thread.threadId !==threadId));
+      if(threadId === currThreadId){
+        createNewChat();
+      }
+
+    }catch(err){
+      console.error(err);
+    }
+  }
   return (
     <div className='sidebar'>
         
@@ -62,7 +78,14 @@ export default function Sidebar() {
               allThreads?.map((thread, idx)=>(
                 <li key={idx}
                   onClick={()=>changeThread(thread.threadId)}
-                >{thread.title}</li>
+                  className={thread.threadId===currThreadId? "highlighted": " "}
+                >{thread.title}<DeleteOutlineOutlinedIcon className='delete' 
+                  style={{color:'red'}} onClick={(e)=> {
+                    e.stopPropagation();
+                    deleteThread(thread.threadId);
+                  }}
+                />
+                </li>
               ))
             }
         </ul>

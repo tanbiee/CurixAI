@@ -7,10 +7,14 @@ import SendIcon from '@mui/icons-material/Send';
 import { MyContext } from './MyContext.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import { ScaleLoader } from "react-spinners"
+import UpgradeOutlinedIcon from '@mui/icons-material/UpgradeOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 
 export default function ChatWindow() {
   const {prompt, setPrompt, reply, setReply, currThreadId, setCurrThreadId, prevChats, setPrevChats,setNewChat} = useContext(MyContext);
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     if (!currThreadId) {
       setCurrThreadId(uuidv4());
@@ -74,14 +78,26 @@ export default function ChatWindow() {
     }
     setPrompt("");
   }, [reply]);
+  
+  const handleProfileClick =()=>{
+    setIsOpen(!isOpen);
+  }
   return (
     <div className='chatWindow'>
       <div className="navbar">
         <span>CurixAI <ExpandMoreIcon/></span>
-        <div className="userIconDiv">
+        <div className="userIconDiv" onClick={handleProfileClick}>
           <span><PersonIcon /></span>
         </div>
       </div>
+      {
+        isOpen && 
+        <div className='dropDown'>
+          <div className="dropDownItem"><SettingsOutlinedIcon/> settings</div>
+          <div className="dropDownItem"><UpgradeOutlinedIcon/>Upgrade plan</div>
+          <div className="dropDownItem"><LoginOutlinedIcon/>Log out</div>
+        </div>
+      }
       <Chat></Chat>
       <ScaleLoader color='white' loading={loading}/>
       <div className="chatInput">

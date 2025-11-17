@@ -6,6 +6,9 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    
+
+
 }
 
 .logo{
@@ -41,6 +44,7 @@ button:hover{
     margin: 10px;
     padding: 10px;
     height: 100%;
+    overflow-y: scroll;
 }
 
 .history li{
@@ -51,6 +55,7 @@ button:hover{
     font-size: 14px;
     border: solid 10px transparent;
     position: relative;
+    
 }
 
 .history li:hover{
@@ -64,4 +69,26 @@ button:hover{
     font-size: 14px;
     text-align: center;
     border-top: solid 0.25px rgba(255,255,255,0.15);
+}
+
+.delete{
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    
+}
+
+.history li:hover .delete{
+    opacity: 1;   
+    color: #fff;
+
+}
+
+.delete:hover{
+    height: 30px;
+    width: 30px;
+}
+.highlighted{
+    background-color: rgba(180, 180, 180, 0.05);
+    border-radius: 10px;
 }
