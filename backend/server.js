@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { GoogleGenAI } from '@google/genai';
 import mongoose from 'mongoose';
+import helmet from 'helmet';
 import chatRoutes from './routes/chat.js';
 import authRoutes from './routes/auth.js';
 const app = express();
@@ -10,7 +11,19 @@ const port = process.env.PORT || 3030;
 
 
 app.use(express.json());
-app.use(cors());
+
+// Enable helmet but allow cross-origin opener policy, which Google Auth needs
+app.use(helmet({
+    crossOriginOpenerPolicy: { policy: "unsafe-none" },
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// Configure CORS for Vercel/localhost
+app.use(cors({
+    origin: ["http://localhost:5173", "http://localhost:5174", "https://curixai.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+}));
 
 app.use("/api/auth", authRoutes);
 app.use("/api", chatRoutes);
