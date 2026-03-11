@@ -41,8 +41,8 @@ router.post('/google', async (req, res) => {
             }
         });
     } catch (err) {
-        console.error("Error verifying Google ID token:", err);
-        res.status(401).json({ error: "Invalid credentials" });
+        console.error("Error verifying Google ID token:", err.message);
+        res.status(401).json({ error: err.message || "Invalid credentials" });
     }
 });
 
