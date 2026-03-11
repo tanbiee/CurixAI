@@ -49,8 +49,6 @@ router.get("/thread/:threadId", async(req, res)=>{
 
 router.delete("/thread/:threadId", async(req,res)=>{
     const {threadId} = req.params;
-    const {userId} = req.body; // Using body or query, let's assume query or body depending on frontend, usually DELETE body is not standard but we'll check frontend logic. actually let's use query for DELETE. Wait, body is used below. Let's look for userId in req.query or req.body. Let's just do `const userId = req.body.userId || req.query.userId;`
-    // Even better, the frontend should send it.
     const userId = req.query.userId || req.body.userId;
 
     try{
