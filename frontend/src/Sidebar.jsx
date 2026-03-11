@@ -7,11 +7,13 @@ import { v1 as uuidv1 } from 'uuid';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 export default function Sidebar() {
-  const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats} = useContext(MyContext);
+  const {user, allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats} = useContext(MyContext);
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3030";
 
   const getAllThreads =async()=>{
+    if (!user) return;
     try{
-      const response = await fetch("http://localhost:3030/api/thread");
+      const response = await fetch(`${API_URL}/api/thread?userId=${user.id}`);
       const res = await response.json();
       const filterData = res.map(thread=>({
         threadId: thread.threadId, 
@@ -40,7 +42,7 @@ export default function Sidebar() {
     setCurrThreadId(newThreadId);
 
     try{
-      const response = await fetch(`http://localhost:3030/api/thread/${newThreadId}`)
+      const response = await fetch(`${API_URL}/api/thread/${newThreadId}?userId=${user.id}`)
       const res = await response.json();
       console.log(res);
       setPrevChats(res);
@@ -52,7 +54,7 @@ export default function Sidebar() {
   }
   const deleteThread = async(threadId)=>{
     try{
-      const response = await fetch(`http://localhost:3030/api/thread/${threadId}`,{method: "DELETE"})
+      const response = await fetch(`${API_URL}/api/thread/${threadId}?userId=${user.id}`,{method: "DELETE"})
       const res = await response.json();
       console.log(res);
       //update threads re-render

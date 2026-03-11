@@ -3,17 +3,16 @@ import express from 'express'
 import cors from 'cors'
 import { GoogleGenAI } from '@google/genai';
 import mongoose from 'mongoose';
-import chatRoutes from './routes/chat.js'
-
-
-
+import chatRoutes from './routes/chat.js';
+import authRoutes from './routes/auth.js';
 const app = express();
-const port = 3030;
+const port = process.env.PORT || 3030;
 
 
 app.use(express.json());
 app.use(cors());
 
+app.use("/api/auth", authRoutes);
 app.use("/api", chatRoutes);
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;

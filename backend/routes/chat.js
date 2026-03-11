@@ -19,8 +19,11 @@ router.post("/test", async(req, res)=>{
 });
 
 router.get("/thread", async(req,res)=>{
+    const { userId } = req.query;
+    if (!userId) return res.status(400).json({error: "User ID required"});
+    
     try{
-        const threads = await Thread.find({}).sort({updated: -1});
+        const threads = await Thread.find({ userId }).sort({updated: -1});
         res.json(threads);
     }catch(err){
         console.log(err);
@@ -30,9 +33,10 @@ router.get("/thread", async(req,res)=>{
 
 router.get("/thread/:threadId", async(req, res)=>{
     const {threadId} = req.params;
-
+    const {userId} = req.query;
+    
     try{
-        const thread = await Thread.findOne({threadId});
+        const thread = await Thread.findOne({threadId, userId});
         if(!thread){
             return res.status(404).json({error: "threads not found"});
         }
@@ -45,9 +49,12 @@ router.get("/thread/:threadId", async(req, res)=>{
 
 router.delete("/thread/:threadId", async(req,res)=>{
     const {threadId} = req.params;
+    const {userId} = req.body; // Using body or query, let's assume query or body depending on frontend, usually DELETE body is not standard but we'll check frontend logic. actually let's use query for DELETE. Wait, body is used below. Let's look for userId in req.query or req.body. Let's just do `const userId = req.body.userId || req.query.userId;`
+    // Even better, the frontend should send it.
+    const userId = req.query.userId || req.body.userId;
 
     try{
-        const deletedThread = await Thread.findOneAndDelete({threadId});
+        const deletedThread = await Thread.findOneAndDelete({threadId, userId});
         if(!deletedThread){
             res.status(404).json({error: "threadnot found"});
         }
@@ -59,15 +66,16 @@ router.delete("/thread/:threadId", async(req,res)=>{
 })
 
 router.post("/chat", async(req, res)=>{
-    const  {threadId, message} = req.body;
+    const  {threadId, message, userId} = req.body;
 
-    if(!threadId || !message){
+    if(!threadId || !message || !userId){
         return res.status(400).json({error: "missing required fileds"});
     }
     try{
-        let thread = await Thread.findOne({threadId});
+        let thread = await Thread.findOne({threadId, userId});
         if(!thread){
             thread = new Thread({
+                userId,
                 threadId,
                 title: message,
                 message: [{role: "user", content: message}]

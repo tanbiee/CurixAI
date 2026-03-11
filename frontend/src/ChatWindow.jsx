@@ -12,9 +12,11 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 
 export default function ChatWindow() {
-  const {prompt, setPrompt, reply, setReply, currThreadId, setCurrThreadId, prevChats, setPrevChats,setNewChat} = useContext(MyContext);
+  const {user, setUser, prompt, setPrompt, reply, setReply, currThreadId, setCurrThreadId, prevChats, setPrevChats,setNewChat} = useContext(MyContext);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3030";
+
   useEffect(() => {
     if (!currThreadId) {
       setCurrThreadId(uuidv4());
@@ -30,13 +32,14 @@ export default function ChatWindow() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        userId: user.id,
         threadId: currThreadId,
         message: prompt
         
       })
     }
     try{
-      const response = await fetch("http://localhost:3030/api/chat", options);
+      const response = await fetch(`${API_URL}/api/chat`, options);
       if(!response.ok) {
         const errorData = await response.json();
         console.error("API error:", errorData);
@@ -82,12 +85,21 @@ export default function ChatWindow() {
   const handleProfileClick =()=>{
     setIsOpen(!isOpen);
   }
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("curixai_user");
+  }
   return (
     <div className='chatWindow'>
       <div className="navbar">
         <span>CurixAI <ExpandMoreIcon/></span>
         <div className="userIconDiv" onClick={handleProfileClick}>
-          <span><PersonIcon /></span>
+          {user && user.picture ? (
+            <img src={user.picture} alt="Profile" style={{ width: '100%', borderRadius: '50%' }} />
+          ) : (
+            <span><PersonIcon /></span>
+          )}
         </div>
       </div>
       {
@@ -95,7 +107,7 @@ export default function ChatWindow() {
         <div className='dropDown'>
           <div className="dropDownItem"><SettingsOutlinedIcon/> settings</div>
           <div className="dropDownItem"><UpgradeOutlinedIcon/>Upgrade plan</div>
-          <div className="dropDownItem"><LoginOutlinedIcon/>Log out</div>
+          <div className="dropDownItem" onClick={handleLogout}><LoginOutlinedIcon/>Log out</div>
         </div>
       }
       <Chat></Chat>
