@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import "./Chatwindow.css"
+import "./ChatWindow.css"
 import Chat from './Chat.jsx'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PersonIcon from '@mui/icons-material/Person';
