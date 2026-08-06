@@ -11,34 +11,34 @@ import "highlight.js/styles/github-dark.css" //to give  the assistant code styli
 //react-markdown(proper formatting of information)
 //rehype-highlight(use for syntex highlight)
 export default function Chat() {
-  const {newChat, prevChats, reply} = useContext(MyContext);
+  const { newChat, prevChats, reply } = useContext(MyContext);
   const [latestReply, setLatestReply] = useState(null);
 
-  useEffect(()=>{
-    if(newChat || !reply) {
+  useEffect(() => {
+    if (newChat || !reply) {
       setLatestReply(null);
     }
   }, [newChat, reply])
 
-  useEffect(()=>{
-    if(!reply) return;
+  useEffect(() => {
+    if (!reply) return;
 
     const content = reply.split(" "); //individual words
     let currentIdx = 0;
     // start with empty string so typing UI appears
     setLatestReply("");
 
-    const interval = setInterval(()=>{
+    const interval = setInterval(() => {
       currentIdx++;
       setLatestReply(content.slice(0, currentIdx).join(" "));
-      if(currentIdx >= content.length) {
+      if (currentIdx >= content.length) {
         clearInterval(interval);
         // typing finished -> hide typing so history shows full assistant reply
         setLatestReply(null);
       }
     }, 40);
 
-    return ()=>clearInterval(interval);
+    return () => clearInterval(interval);
     //latest reply seperate => typing effect create
   }, [reply])
 
@@ -48,7 +48,7 @@ export default function Chat() {
       {newChat && <h1>Start a New Chat!</h1>}
       <div className="chats">
         {
-          prevChats?.slice(0,-1).map((chat, idx) => (
+          prevChats?.slice(0, -1).map((chat, idx) => (
             <div className={chat.role === "user" ? "userDiv" : "gptDiv"} key={idx}>
               {chat.role === "user" ? (
                 <p className="userMessage">{chat.content}</p>
@@ -78,7 +78,7 @@ export default function Chat() {
           )
         }
 
-        
+
 
       </div>
     </>

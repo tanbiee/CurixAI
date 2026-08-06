@@ -12,7 +12,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 
 export default function ChatWindow() {
-  const {user, setUser, prompt, setPrompt, reply, setReply, currThreadId, setCurrThreadId, prevChats, setPrevChats,setNewChat} = useContext(MyContext);
+  const { user, setUser, prompt, setPrompt, reply, setReply, currThreadId, setCurrThreadId, prevChats, setPrevChats, setNewChat } = useContext(MyContext);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3030";
@@ -22,8 +22,8 @@ export default function ChatWindow() {
       setCurrThreadId(uuidv4());
     }
   }, []);
-  
-  const getreply= async()=>{
+
+  const getreply = async () => {
     setNewChat(false);
     setLoading(true)
     const options = {
@@ -35,12 +35,12 @@ export default function ChatWindow() {
         userId: user.id,
         threadId: currThreadId,
         message: prompt
-        
+
       })
     }
-    try{
+    try {
       const response = await fetch(`${API_URL}/api/chat`, options);
-      if(!response.ok) {
+      if (!response.ok) {
         const errorData = await response.json();
         console.error("API error:", errorData);
         alert("Error: " + (errorData.error || "Failed to get response"));
@@ -50,21 +50,21 @@ export default function ChatWindow() {
       const res = await response.json();
       console.log("API Response:", res);
 
-      if(res.reply) {
+      if (res.reply) {
         setReply(res.reply);
       } else {
         console.warn("No reply in response");
         alert("No response from API");
       }
 
-    }catch(err){
+    } catch (err) {
       console.error("Fetch error:", err);
       alert("Network error: " + err.message);
     }
     setLoading(false);
   }
-  useEffect(()=>{
-    if(prompt && reply){
+  useEffect(() => {
+    if (prompt && reply) {
       setPrevChats(prevChats => {
         return [
           ...prevChats,
@@ -81,8 +81,8 @@ export default function ChatWindow() {
     }
     setPrompt("");
   }, [reply]);
-  
-  const handleProfileClick =()=>{
+
+  const handleProfileClick = () => {
     setIsOpen(!isOpen);
   }
 
@@ -93,7 +93,7 @@ export default function ChatWindow() {
   return (
     <div className='chatWindow'>
       <div className="navbar">
-        <span>CurixAI <ExpandMoreIcon/></span>
+        <span>CurixAI <ExpandMoreIcon /></span>
         <div className="userIconDiv" onClick={handleProfileClick}>
           {user && user.picture ? (
             <img src={user.picture} alt="Profile" style={{ width: '100%', borderRadius: '50%' }} />
@@ -103,30 +103,30 @@ export default function ChatWindow() {
         </div>
       </div>
       {
-        isOpen && 
+        isOpen &&
         <div className='dropDown'>
-          <div className="dropDownItem"><SettingsOutlinedIcon/> settings</div>
-          <div className="dropDownItem"><UpgradeOutlinedIcon/>Upgrade plan</div>
-          <div className="dropDownItem" onClick={handleLogout}><LoginOutlinedIcon/>Log out</div>
+          <div className="dropDownItem"><SettingsOutlinedIcon /> settings</div>
+          <div className="dropDownItem"><UpgradeOutlinedIcon />Upgrade plan</div>
+          <div className="dropDownItem" onClick={handleLogout}><LoginOutlinedIcon />Log out</div>
         </div>
       }
       <Chat></Chat>
-      <ScaleLoader color='white' loading={loading}/>
+      <ScaleLoader color='white' loading={loading} />
       <div className="chatInput">
         <div className="userInput">
-          <input type="text" placeholder='Ask anything' value={prompt}            
-            onChange={(e)=>setPrompt(e.target.value)}
-            onKeyDown={(e)=>e.key== 'Enter'? getreply(): ''}
+          <input type="text" placeholder='Ask anything' value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => e.key == 'Enter' ? getreply() : ''}
           >
-           
+
           </input>
-          <div className="submit"  onClick={getreply}><SendIcon/></div>
+          <div className="submit" onClick={getreply}><SendIcon /></div>
         </div>
         <p className="info">
           CurixAI can make mistakes. Check important info. SeeCookie Preference.
         </p>
       </div>
-      
+
     </div>
   )
 }

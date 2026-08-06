@@ -1,42 +1,54 @@
 import "dotenv/config"
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
+const GROQ_API_KEY = process.env.GROQ_API_KEY
 
-const getGeminiResponse = async (message)=>{
-    const options ={
+const getGeminiResponse = async (messages) => {
+    let contents = [];
+    if (Array.isArray(messages)) {
+        const contextWindow = messages.slice(-20);
+
+        contents = contextWindow.map(msg => ({
+            role: msg.role === "assistant" ? "assistant" : "user",
+            content: msg.content
+        }));
+    } else {
+        contents = [
+            {
+                role: "user",
+                content: messages
+            }
+        ];
+    }
+
+    const options = {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "x-goog-api-key": GEMINI_API_KEY,
+            "Authorization": `Bearer ${GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-            contents: [
-                {
-                    role: "user",
-                    parts: [{text: message}]
-                }
-            ],
-            generationConfig: {
-                temperature: 0.7
-            }
+            messages: contents,
+            model: "llama-3.1-8b-instant",
+            temperature: 0.7
         }),
 
     };
-    try{
+    try {
         const response = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+            "https://api.groq.com/openai/v1/chat/completions",
             options
         );
         const data = await response.json();
         console.log(data);
-        
 
-        if(!response.ok){
-            console.error("error gemini api", data)
-            throw new Error(`Gemini API error: ${response.status}`);
+
+        if (!response.ok) {
+            console.error("error groq api", data)
+            throw new Error(`Groq API error: ${response.status}`);
         }
-        const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "error: could not parse ai response";
+        const textResponse = data.choices?.[0]?.message?.content || "error: could not parse ai response";
         return textResponse;
-    }catch(err){
+    } catch (err) {
         console.error("fetch error: ", err);
         throw err;
     }
